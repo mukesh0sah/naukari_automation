@@ -22,6 +22,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.chrome.service import Service as ChromeService
 import constants
+import tempfile
 
 # Add folder Path of your resume
 originalResumePath = constants.ORIGINAL_RESUME_PATH
@@ -162,9 +163,10 @@ def LoadNaukri(headless):
     options.add_argument("--start-maximized")  # ("--kiosk") for MAC
     options.add_argument("--disable-popups")
     options.add_argument("--disable-gpu")
+    options.add_argument("--no-sandbox")            # ← add
     if headless:
+        options.add_argument("--headless=new")      # Chrome ≥109
         options.add_argument("--disable-dev-shm-usage")
-        options.add_argument("headless")
 
     # updated to use latest selenium Chrome service
     driver = None
@@ -272,7 +274,7 @@ def UpdateProfile(driver):
                 mobFieldElement.clear()
                 mobFieldElement.send_keys(mob)
                 driver.implicitly_wait(2)
-                
+
             saveFieldElement = GetElement(driver, saveXpath, locator="XPATH")
             saveFieldElement.send_keys(Keys.ENTER)
             driver.implicitly_wait(3)
@@ -289,7 +291,7 @@ def UpdateProfile(driver):
                 mobFieldElement.clear()
                 mobFieldElement.send_keys(mob)
                 driver.implicitly_wait(2)
-    
+
             saveFieldElement = GetElement(driver, saveXpath, locator="XPATH")
             saveFieldElement.send_keys(Keys.ENTER)
             driver.implicitly_wait(3)
