@@ -1,0 +1,55 @@
+name: Naukri – daily profile update
+
+on:
+  # run every day at 08:00 IST  (= 02:30 UTC)
+  schedule:
+    - cron: '30 2 * * *'
+  # allow manual runs from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  update-profile:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1) checkout your code
+      - uses: actions/checkout@v4
+
+      # 2) set up Python
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      # 3) install Google Chrome (includes the matching driver)
+      - uses: browser-actions/setup-chrome@latest
+
+      # 4) install Python deps
+      - name: Install requirements
+        run: |
+          python -m pip install -U pip
+          pip install -r requirements.txt
+
+      # 5) create a constants.py file populated from GitHub Secrets
+      #    (this overwrites the one in the repo so nothing sensitive is committed)
+      - name: Inject credentials
+        env:
+          NAUKRI_USERNAME:  ${{ secrets.NAUKRI_USERNAME }}
+          NAUKRI_PASSWORD:  ${{ secrets.NAUKRI_PASSWORD }}
+          NAUKRI_MOBILE:    ${{ secrets.NAUKRI_MOBILE }}
+        run: |
+          cat > constants.py <<'PY'
+          USERNAME = "mukeshsah1405@gmail.com"
+          PASSWORD = "P@ssword@7668"
+          MOBILE   = "9632432862"
+
+          # update these two paths if your resume files live elsewhere in the repo
+          ORIGINAL_RESUME_PATH = "resume/original.pdf"
+          MODIFIED_RESUME_PATH = "resume/modified.pdf"
+
+          NAUKRI_LOGIN_URL   = "https://www.naukri.com/nlogin/login"
+          NAUKRI_PROFILE_URL = "https://www.naukri.com/mnjuser/profile"
+          PY
+
+      # 6) run the automation
+      - name: Run daily update
+        run: python naukri.py
