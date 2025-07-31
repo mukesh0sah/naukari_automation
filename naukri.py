@@ -163,9 +163,13 @@ def LoadNaukri(headless):
     options.add_argument("--start-maximized")  # ("--kiosk") for MAC
     options.add_argument("--disable-popups")
     options.add_argument("--disable-gpu")
-    options.add_argument("--no-sandbox")            # ← add
+    options.add_argument("--no-sandbox")
+    # use an isolated user-data dir to avoid locking conflicts
+    tmp_profile = tempfile.mkdtemp()
+    options.add_argument(f"--user-data-dir={tmp_profile}")
+
     if headless:
-        options.add_argument("--headless=new")      # Chrome ≥109
+        options.add_argument("--headless=new")
         options.add_argument("--disable-dev-shm-usage")
 
     # updated to use latest selenium Chrome service
